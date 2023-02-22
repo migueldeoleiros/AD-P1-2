@@ -7,7 +7,7 @@ Números de aluno: 58645, 59436
 
 # zona para fazer importação
 
-import sock_utils
+import socket as s
 
 # definição da classe server_connection
 
@@ -16,21 +16,28 @@ class server_connection:
     Abstrai uma ligação a um servidor TCP. Implementa métodos para: estabelecer
     a ligação; envio de um comando e receção da resposta; terminar a ligação.
     """
+
     def __init__(self, address, port):
         """Inicializa a classe com parâmetros para funcionamento futuro."""
-        pass  # Remover esta linha e fazer implementação da função
+        self.address = address
+        self.port = port
 
     def connect(self):
         """Estabelece a ligação ao servidor especificado na inicialização."""
-        pass  # Remover esta linha e fazer implementação da função
+        self.sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+        self.sock.connect((self.address, self.port))
 
     def send_receive(self, data):
         """
         Envia os dados contidos em data para a socket da ligação,
         e retorna a resposta recebida pela mesma socket.
         """
-        pass  # Remover esta linha e fazer implementação da função
+        # send
+        self.sock.sendall(data)
+        # receive
+        msg = self.sock.recv(1024)
+        print(msg)
 
     def close(self):
         """Termina a ligação ao servidor."""
-        pass  # Remover esta linha e fazer implementação da função
+        self.sock.close()
