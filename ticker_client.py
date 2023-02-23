@@ -8,6 +8,7 @@ Números de aluno: 58645, 59436
 # Zona para fazer imports
 from net_client import server_connection
 import sys
+import time
 
 # get parameters
 user = sys.argv[1]
@@ -16,17 +17,24 @@ port = int(sys.argv[3])
 
 
 def validate_run(msg):
-    """Validate the command and run the apropiate function."""
+    """
+    Validate the command and run the apropiate function.
+
+    Returns:
+        True if the command needs to continue
+        False if the command needs to exit
+    """
     # Define a dictionary of valid commands and their number of parameters
     valid_commands = {
         'SUBSCR': (2, None),
         'CANCEL': (1, None),
         'STATUS': (1, None),
-        'INFOS':  (1, ('M', 'K')),
+        'INFOS':  (('M', 1), ('K', 1)),
         'STATIS': (('L', 2), ('ALL', 1)),
         'SLEEP':  (1, None),
         'EXIT':   (0, None)
     }
+    commands_long = ['INFOS', 'STATIS']
     local_commands = ['SLEEP', 'EXIT']
 
     # Parse the input string into a command and its parameters
@@ -37,31 +45,52 @@ def validate_run(msg):
     # Check if the command is valid and has the right number of parameters
     if command in valid_commands:
         param_info = valid_commands[command]
-        if isinstance(param_info[0], str) and parameters[0] == param_info[0]:
-            num_params = param_info[1]
-        elif isinstance(param_info[1], str) and parameters[0] == param_info[1]:
-            num_params = param_info[0]
+        if command in commands_long:
+            if len(parameters) != 0 and parameters[0] in param_info[0]:
+                num_params = param_info[0][1]
+            elif len(parameters) != 0 and parameters[0] in param_info[1]:
+                num_params = param_info[1][1]
+            else:
+                print("UNKNOWN-COMMAND")
+                return True
         else:
             num_params = param_info[0]
 
         if len(parameters) == num_params:
             if command in local_commands:
-                print('command to execute locally')
+                return run_local_command(msg)
             else:
-                print('command to send server')
-                conn.send_receive(msg.encode())
+                server_request(msg)
+                return False
         else:
             print("MISSING-ARGUMENTS")
+            return True
     else:
         print("UNKNOWN-COMMAND")
+        return True
 
 
-# connect to server
-conn = server_connection(host, port)
-conn.connect()
+def server_request(msg):
+    """Envia os comandos ao servidor."""
+    conn = server_connection(host, port)
+    conn.connect()
 
-# send message
-msg = input('>> ')
-validate_run(msg)
+    conn.send_receive(msg.encode())
 
-conn.close()
+    conn.close()
+
+
+def run_local_command(msg):
+    """Executa os comandos locais."""
+    parts = msg.split()
+    if parts[0] == 'SLEEP':
+        time.sleep(int(parts[1]))
+        return True
+    else:
+        return False
+
+
+run = True
+while run:
+    msg = input('comando> ')
+    run = validate_run(msg)
