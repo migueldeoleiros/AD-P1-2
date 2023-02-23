@@ -10,10 +10,12 @@ from net_client import server_connection
 
 # Programa principal
 
+# connect to server
 conn = server_connection("localhost", 9999)
-
 conn.connect()
 
-conn.send_receive(b'test send from client')
+# send message
+msg = input('>> ')
+conn.send_receive(msg.encode('utf-8'))
 
 conn.close()
