@@ -8,6 +8,7 @@ Números de aluno: 58645, 59436
 
 # Zona para fazer importação
 import socket as s
+import sys
 
 ###############################################################################
 
@@ -62,8 +63,8 @@ class resource_pool:
 
 # código do programa principal
 
-host = 'localhost'
-port = 9999
+host = sys.argv[1]
+port = int(sys.argv[2])
 
 sock = s.socket(s.AF_INET, s.SOCK_STREAM)
 # sock.setsockopt(s.SOL_SOCKET, s.SO_REUSEADDR, 1)
@@ -74,7 +75,7 @@ sock.listen(1)
 print('ligado a %s no porto %s' % (addr, port))
 
 msg = conn_sock.recv(1024)
-print(msg)
+print(msg.decode('utf-8'))
 
 conn_sock.sendall(b'test send from server')
 

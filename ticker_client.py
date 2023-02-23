@@ -7,11 +7,16 @@ Números de aluno: 58645, 59436
 """
 # Zona para fazer imports
 from net_client import server_connection
+import sys
 
 # Programa principal
 
 # connect to server
-conn = server_connection("localhost", 9999)
+user = sys.argv[1]
+host = sys.argv[2]
+port = int(sys.argv[3])
+
+conn = server_connection(host, port)
 conn.connect()
 
 # send message

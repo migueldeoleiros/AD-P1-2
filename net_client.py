@@ -36,7 +36,7 @@ class server_connection:
         self.sock.sendall(data)
         # receive
         msg = self.sock.recv(1024)
-        print(msg)
+        print(msg.decode('utf-8'))
 
     def close(self):
         """Termina a ligação ao servidor."""
