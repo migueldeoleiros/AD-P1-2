@@ -49,7 +49,7 @@ def validate_run(msg):
                 print('command to execute locally')
             else:
                 print('command to send server')
-                conn.send_receive(msg.encode('utf-8'))
+                conn.send_receive(msg.encode())
         else:
             print("MISSING-ARGUMENTS")
     else:
