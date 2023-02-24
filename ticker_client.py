@@ -34,7 +34,6 @@ def validate_run(msg):
         'SLEEP':  (1, None),
         'EXIT':   (0, None)
     }
-    commands_long = ['INFOS', 'STATIS']
     local_commands = ['SLEEP', 'EXIT']
 
     # Parse the input string into a command and its parameters
@@ -42,32 +41,34 @@ def validate_run(msg):
     command = parts[0]
     parameters = parts[1:]
 
-    # Check if the command is valid and has the right number of parameters
-    if command in valid_commands:
-        param_info = valid_commands[command]
-        if command in commands_long:
-            if len(parameters) != 0 and parameters[0] in param_info[0]:
-                num_params = param_info[0][1]
-            elif len(parameters) != 0 and parameters[0] in param_info[1]:
-                num_params = param_info[1][1]
-            else:
-                print("UNKNOWN-COMMAND")
-                return True
-        else:
-            num_params = param_info[0]
-
-        if len(parameters) == num_params:
-            if command in local_commands:
-                return run_local_command(msg)
-            else:
-                server_request(msg)
-                return False
-        else:
-            print("MISSING-ARGUMENTS")
-            return True
-    else:
+    # Check if the command is valid
+    if command not in valid_commands:
         print("UNKNOWN-COMMAND")
         return True
+
+    param_info = valid_commands[command]  # get info about the parameters
+
+    num_params = None  # in case command is neither of the two options below
+
+    # checks number of parameters for long commands
+    if isinstance(param_info[0], tuple):
+        for option in param_info:
+            if parameters[0] in option:
+                num_params = option[1]
+                break
+    else:  # checks number of parameters for normal commands
+        num_params = param_info[0]
+
+    if len(parameters) != num_params:
+        print("MISSING-ARGUMENTS")
+        return True
+
+    # Check if the command is local or has to be run on the server
+    if command in local_commands:
+        return run_local_command(msg)
+    else:
+        server_request(msg)
+        return False
 
 
 def server_request(msg):
