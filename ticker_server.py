@@ -6,47 +6,72 @@ Grupo: 37
 Números de aluno: 58645, 59436
 """
 
-# Zona para fazer importação
+# Imports necessários
 import socket as s
 import sys
+import random
 
 
-###############################################################################
+#----------------------------------------------------------------------------------------------
 
 class resource:
     """Representa um recurso que pode ser subscrito por clientes."""
 
     def __init__(self, resource_id):
         """Inicializa a classe com parâmetros para funcionamento futuro."""
-        pass  # Remover esta linha e fazer implementação da função
+        self.ID = resource_id
+        Name = ""
+        for _ in range(7):
+            Name += random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        self.Name = Name
+        self.Symbol = Name[:3]
+        self.Subscribers = []
 
     def subscribe(self, client_id, time_limit):
         """Subcrebe cliente por um time_limit."""
-        pass  # Remover esta linha e fazer implementação da função
+        if client_id in self.Subscribers:
+            return False
+        else:
+            self.Subscribers += [client_id]
+            return True
 
     def unsubscribe(self, client_id):
         """Remove subscrição do cliente."""
-        pass  # Remover esta linha e fazer implementação da função
+        if client_id in self.Subscribers:
+            self.Subscribers.remove(client_id)
+            return True
+        else:
+            return False
 
     def status(self, client_id):
         """Retorna o estado de um cliente."""
-        pass  # Remover esta linha e fazer implementação da função
+        return client_id in self.Subscribers
 
     def __repr__(self):
         """Retorna a lista de subscritores do recurso."""
-        output = ""
-        # R <resource_id> <list of subscribers>
+        output = "R {} {}".format(self.ID,len(self.Subscribers))
+        for x in self.Subscribers:
+            output += " {}".format(x)
         return output
 
 
-###############################################################################
+#----------------------------------------------------------------------------------------------
 
 class resource_pool:
     """Classe que representa uma pool de recursos que podem ser subscritos por clientes."""
 
     def __init__(self, N, K, M):
         """Inicializa a classe com parâmetros para funcionamento futuro."""
-        pass  # Remover esta linha e fazer implementação da função
+        self.maxSubcriptions = K
+        self.maxSubscribers = N
+        self.Resources = {}
+        while len(self.Resources) < M:
+            id = random.randint(100,200)
+            while id in self.Resources:
+                id = random.randint(100,200)
+            oneResource = resource(id)
+            self.Resources[id] = oneResource
+
 
     def clear_expired_subs(self):
         """Remove os subscritores que expiraram."""
@@ -54,32 +79,70 @@ class resource_pool:
 
     def subscribe(self, resource_id, client_id, time_limit):
         """Subscreve o cliente ao recurso com um limite de tempo para expiração."""
-        pass  # Remover esta linha e fazer implementação da função
+        if resource_id not in self.Resources:
+            return "UNKNOWN RESOURCE"
+        else:
+            x = self.Resources[resource_id].subscribe(client_id,time_limit)
+            if x:
+                return "OK"
+            else:
+                return "NOK"
 
     def unsubscribe(self, resource_id, client_id):
         """Cancela a subscrição do cliente ao recurso."""
-        pass  # Remover esta linha e fazer implementação da função
+        if resource_id not in self.Resources:
+            return "UNKNOWN RESOURCE"
+        else:
+            x = self.Resources[resource_id].unsubscribe(client_id)
+            if x:
+                return "OK"
+            else:
+                return "NOK"
 
     def status(self, resource_id, client_id):
         """Retorna se o cliente está subscrito ao recurso."""
-        pass  # Remover esta linha e fazer implementação da função
+        if resource_id not in self.Resources:
+            return "UNKNOWN RESOURCE"
+        else:
+            x = self.Resources[resource_id].status(client_id)
+            if x:
+                return "SUBSCRIBED"
+            else: 
+                return "UNSUBSCRIBED"
 
     def infos(self, option, client_id):
         """Lista informações sobre os clientes e suas subscrições."""
-        pass  # Remover esta linha e fazer implementação da função
+        result = []
+        for x in self.Resources:
+            if self.status(x,client_id):
+                result += [x]
+        if option == "M":
+            return result
+        else:
+            return self.maxSubcriptions - len(result)
+
+        
 
     def statis(self, option, resource_id):
         """Lista informações sobre os recursos e seus subscritores."""
-        pass  # Remover esta linha e fazer implementação da função
+        if option == "L":
+            if resource_id not in self.Resources:
+                return "UNKNOWN RESOURCE"
+            else:
+                return len(self.Resources[resource_id].Subscribers)
+        else:
+            return self.__repr__()
+
 
     def __repr__(self):
         """Retorna uma lista de subscritores dos recursos."""
         output = ""
-        # Acrescentar no output uma linha por cada recurso
+        for x in self.Resources:
+            output += x.__repr__() + "\n" 
         return output
 
 
-###############################################################################
+#----------------------------------------------------------------------------------------------
 
 # código do programa principal
 
@@ -90,6 +153,7 @@ sock = s.socket(s.AF_INET, s.SOCK_STREAM)
 # sock.setsockopt(s.SOL_SOCKET, s.SO_REUSEADDR, 1)
 
 sock.bind((host, port))
+
 sock.listen(1)
 (conn_sock, (addr, port)) = sock.accept()
 print('ligado a %s no porto %s' % (addr, port))
