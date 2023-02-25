@@ -16,7 +16,6 @@ host = sys.argv[2]
 port = int(sys.argv[3])
 
 
-#Função principal
 def validate_run(msg):
     """
     Validate the command and run the apropiate function.
@@ -25,7 +24,7 @@ def validate_run(msg):
         True if the command needs to continue
         False if the command needs to exit
     """
-    # Define o dicionario de comandos validos, assim como o número de parâmetros de cada
+    # Define o dicionario de comandos validos, assim como o seu número de parâmetros
     valid_commands = {
         'SUBSCR': (2, None),
         'CANCEL': (1, None),
@@ -47,7 +46,7 @@ def validate_run(msg):
         print("UNKNOWN-COMMAND")
         return True
 
-    param_info = valid_commands[command]  # Recebe a informação do comando escrito
+    param_info = valid_commands[command]  # Recebe a informação do comando
 
     num_params = None  # Resultado esperado caso os proximos checks falhem
 
@@ -60,7 +59,8 @@ def validate_run(msg):
     else:  # Obtem o número de parâmetros se o comando for simples
         num_params = param_info[0]
 
-    # Verifica se o número de parâmetros recebido é igual ao número de parâmetros necessário para o comando
+    # Verifica se o número de parâmetros recebido é igual ao
+    # número de parâmetros necessário para o comando
     if len(parameters) != num_params:
         print("MISSING-ARGUMENTS")
         return True
@@ -72,9 +72,9 @@ def validate_run(msg):
         server_request(msg)
         return True
 
-# Função encarregada de fazer a Conexão com o server
+
 def server_request(msg):
-    """Envia os comandos ao servidor."""
+    """Função encarregada de fazer a Conexão com o server."""
     conn = server_connection(host, port)
     conn.connect()
 
@@ -82,9 +82,9 @@ def server_request(msg):
 
     conn.close()
 
-# Funcão encarregada de correr comandos locais
+
 def run_local_command(msg):
-    """Executa os comandos locais."""
+    """Funcão encarregada de correr comandos locais."""
     parts = msg.split()
     if parts[0] == 'SLEEP':
         time.sleep(int(parts[1]))
@@ -92,7 +92,8 @@ def run_local_command(msg):
     else:
         return False
 
-# Loop para o cliente (Sempre True, até a função "run_local_comand" tornar a variavel False)
+
+# Loop para o cliente (Sempre True, até recibir a message de EXIT)
 run = True
 while run:
     message = input('comando -> ')
