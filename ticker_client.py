@@ -70,7 +70,7 @@ def validate_run(msg):
         return run_local_command(msg)
     else:
         server_request(msg)
-        return False
+        return True
 
 # Função encarregada de fazer a Conexão com o server
 def server_request(msg):

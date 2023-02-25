@@ -12,7 +12,7 @@ import sys
 import random
 
 
-#----------------------------------------------------------------------------------------------
+###############################################################################
 
 class resource:
     """Representa um recurso que pode ser subscrito por clientes."""
@@ -55,7 +55,7 @@ class resource:
         return output
 
 
-#----------------------------------------------------------------------------------------------
+###############################################################################
 
 class resource_pool:
     """Classe que representa uma pool de recursos que podem ser subscritos por clientes."""
@@ -121,7 +121,7 @@ class resource_pool:
         else:
             return self.maxSubcriptions - len(result)
 
-        
+
 
     def statis(self, option, resource_id):
         """Lista informações sobre os recursos e seus subscritores."""
@@ -142,7 +142,7 @@ class resource_pool:
         return output
 
 
-#----------------------------------------------------------------------------------------------
+###############################################################################
 
 # código do programa principal
 
@@ -150,17 +150,17 @@ host = sys.argv[1]
 port = int(sys.argv[2])
 
 sock = s.socket(s.AF_INET, s.SOCK_STREAM)
-# sock.setsockopt(s.SOL_SOCKET, s.SO_REUSEADDR, 1)
-
 sock.bind((host, port))
 
-sock.listen(1)
-(conn_sock, (addr, port)) = sock.accept()
-print('ligado a %s no porto %s' % (addr, port))
+while True:
+    sock.listen(1)
+    (conn_sock, (addr, port)) = sock.accept()
+    print('ligado a %s no porto %s' % (addr, port))
 
-msg = conn_sock.recv(1024)
-print(msg.decode())
+    msg = conn_sock.recv(1024)
+    print(msg.decode())
 
-conn_sock.sendall(b'test send from server')
+    conn_sock.sendall(b'test send from server')
+    conn_sock.close()
 
 sock.close()
