@@ -69,7 +69,7 @@ def validate_run(msg):
     if command in local_commands:
         return run_local_command(msg)
     else:
-        server_request(msg)
+        server_request(msg+" "+user)
         return True
 
 
