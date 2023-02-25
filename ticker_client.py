@@ -95,5 +95,5 @@ def run_local_command(msg):
 # Loop para o cliente (Sempre True, até a função "run_local_comand" tornar a variavel False)
 run = True
 while run:
-    msg = input('comando -> ')
-    run = validate_run(msg)
+    message = input('comando -> ')
+    run = validate_run(message)
