@@ -49,7 +49,7 @@ class resource:
 
     def __repr__(self):
         """Retorna a lista de subscritores do recurso."""
-        output = "R {} {}".format(self.ID,len(self.Subscribers))
+        output = "R {} {}".format(self.ID, len(self.Subscribers))
         for x in self.Subscribers:
             output += " {}".format(x)
         return output
@@ -66,12 +66,11 @@ class resource_pool:
         self.maxSubscribers = N
         self.Resources = {}
         while len(self.Resources) < M:
-            id = random.randint(100,200)
+            id = random.randint(100, 200)
             while id in self.Resources:
-                id = random.randint(100,200)
+                id = random.randint(100, 200)
             oneResource = resource(id)
             self.Resources[id] = oneResource
-
 
     def clear_expired_subs(self):
         """Remove os subscritores que expiraram."""
@@ -82,7 +81,7 @@ class resource_pool:
         if resource_id not in self.Resources:
             return "UNKNOWN RESOURCE"
         else:
-            x = self.Resources[resource_id].subscribe(client_id,time_limit)
+            x = self.Resources[resource_id].subscribe(client_id, time_limit)
             if x:
                 return "OK"
             else:
@@ -107,21 +106,19 @@ class resource_pool:
             x = self.Resources[resource_id].status(client_id)
             if x:
                 return "SUBSCRIBED"
-            else: 
+            else:
                 return "UNSUBSCRIBED"
 
     def infos(self, option, client_id):
         """Lista informações sobre os clientes e suas subscrições."""
         result = []
         for x in self.Resources:
-            if self.status(x,client_id):
+            if self.status(x, client_id):
                 result += [x]
         if option == "M":
             return result
         else:
             return self.maxSubcriptions - len(result)
-
-
 
     def statis(self, option, resource_id):
         """Lista informações sobre os recursos e seus subscritores."""
@@ -133,34 +130,85 @@ class resource_pool:
         else:
             return self.__repr__()
 
-
     def __repr__(self):
         """Retorna uma lista de subscritores dos recursos."""
         output = ""
         for x in self.Resources:
-            output += x.__repr__() + "\n" 
+            output += x.__repr__() + "\n"
         return output
+
+
+class ticker_server:
+    """Gera as ligações por sockets com o cliente."""
+
+    def __init__(self, resource_pool):
+        """Inicializa a classe com parâmetros para funcionamento futuro."""
+        self.resources = resource_pool
+
+    def connect(self, socket):
+        """Estabelece a ligação ao cliente."""
+        socket.listen(1)
+        (self.conn_sock, (addr, port)) = socket.accept()
+        print('ligado a %s no porto %s' % (addr, port))
+
+    def receive(self):
+        """Recebe a mensagem do cliente.
+
+        Returns:
+            message (bytes): Mensagem recebida do cliente.
+        """
+        message = self.conn_sock.recv(1024)
+        print(message.decode())
+        return message
+
+    def process_command(self, msg):
+        """Executa o comando apropriado para uma mensagem.
+
+        Args:
+            msg (str): Mensagem recebida do cliente.
+
+        Returns:
+            answer (str): Resposta ao comando executado.
+        """
+        command = msg.split()
+
+        if command[0] == 'SUBSCR':
+            answer = self.resources.subscribe(command[1], command[3], command[2])
+        elif command[0] == 'CANCEL':
+            answer = self.resources.unsubscribe(command[1], command[2])
+        elif command[0] == 'STATUS':
+            answer = self.resources.status(command[1], command[2])
+        elif command[0] == 'INFOS':
+            answer = self.resources.infos(command[1], command[2])
+        elif command[0] == 'STATIS':
+            answer = self.resources.statis(command[1], command[2])
+
+        self.conn_sock.sendall(answer.encode())
+
+    def close(self):
+        """Termina a ligação ao servidor."""
+        self.conn_sock.close()
 
 
 ###############################################################################
 
 # código do programa principal
-
 host = sys.argv[1]
 port = int(sys.argv[2])
+M = int(sys.argv[3])
+K = int(sys.argv[4])
+N = int(sys.argv[5])
 
 sock = s.socket(s.AF_INET, s.SOCK_STREAM)
 sock.bind((host, port))
 
+resources = resource_pool(N, K, M)
+server = ticker_server(resources)
+
 while True:
-    sock.listen(1)
-    (conn_sock, (addr, port)) = sock.accept()
-    print('ligado a %s no porto %s' % (addr, port))
-
-    msg = conn_sock.recv(1024)
-    print(msg.decode())
-
-    conn_sock.sendall(b'test send from server')
-    conn_sock.close()
+    server.connect(sock)
+    message = server.receive()
+    server.process_command(message.decode())
+    server.close()
 
 sock.close()
