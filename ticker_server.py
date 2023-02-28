@@ -10,6 +10,7 @@ Números de aluno: 58645, 59436
 import socket as s
 import sys
 import random
+import time
 
 
 ###############################################################################
@@ -29,29 +30,32 @@ class resource:
 
     def subscribe(self, client_id, time_limit):
         """Subcrebe cliente por um time_limit."""
-        if client_id in self.Subscribers:
+        if (client_id, time_limit) in self.Subscribers:
             return False
         else:
-            self.Subscribers += [client_id]
+            self.Subscribers.append((client_id, time.time()+time_limit))
             return True
 
     def unsubscribe(self, client_id):
         """Remove subscrição do cliente."""
-        if client_id in self.Subscribers:
-            self.Subscribers.remove(client_id)
-            return True
-        else:
-            return False
+        for i, (id, _) in enumerate(self.Subscribers):
+            if id == client_id:
+                self.Subscribers.pop(i)
+                return True
+        return False
 
     def status(self, client_id):
         """Retorna o estado de um cliente."""
-        return client_id in self.Subscribers
+        for (id, _) in self.Subscribers:
+            if id == client_id:
+                return True
+        return False
 
     def __repr__(self):
         """Retorna a lista de subscritores do recurso."""
         output = "R {} {}".format(self.ID, len(self.Subscribers))
         for x in self.Subscribers:
-            output += " {}".format(x)
+            output += " {}".format(x[0])
         return output
 
 
