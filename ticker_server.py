@@ -74,18 +74,19 @@ class resource_pool:
 
     def clear_expired_subs(self):
         """Remove os subscritores que expiraram."""
+        # TODO
         pass  # Remover esta linha e fazer implementação da função
 
     def subscribe(self, resource_id, client_id, time_limit):
         """Subscreve o cliente ao recurso com um limite de tempo para expiração."""
         if resource_id not in self.Resources:
             return "UNKNOWN RESOURCE"
-        else:
-            x = self.Resources[resource_id].subscribe(client_id, time_limit)
-            if x:
-                return "OK"
-            else:
-                return "NOK"
+        elif int(self.infos("K", client_id)) > 0:
+            if int(self.statis("L", resource_id)) < self.maxSubscribers:
+                x = self.Resources[resource_id].subscribe(client_id, time_limit)
+                if x:
+                    return "OK"
+        return "NOK"
 
     def unsubscribe(self, resource_id, client_id):
         """Cancela a subscrição do cliente ao recurso."""
@@ -113,12 +114,12 @@ class resource_pool:
         """Lista informações sobre os clientes e suas subscrições."""
         result = []
         for x in self.Resources:
-            if self.status(x, client_id):
+            if "SUBSCRIBED" == self.status(x, client_id):
                 result += [x]
         if option == "M":
-            return result
+            return str(result)
         else:
-            return self.maxSubcriptions - len(result)
+            return str(self.maxSubcriptions - len(result))
 
     def statis(self, option, resource_id):
         """Lista informações sobre os recursos e seus subscritores."""
@@ -126,7 +127,7 @@ class resource_pool:
             if resource_id not in self.Resources:
                 return "UNKNOWN RESOURCE"
             else:
-                return len(self.Resources[resource_id].Subscribers)
+                return str(len(self.Resources[resource_id].Subscribers))
         else:
             return self.__repr__()
 
@@ -134,7 +135,7 @@ class resource_pool:
         """Retorna uma lista de subscritores dos recursos."""
         output = ""
         for x in self.Resources:
-            output += x.__repr__() + "\n"
+            output += self.Resources[x].__repr__() + "\n"
         return output
 
 
@@ -173,15 +174,15 @@ class ticker_server:
         command = msg.split()
 
         if command[0] == 'SUBSCR':
-            answer = self.resources.subscribe(command[1], command[3], command[2])
+            answer = self.resources.subscribe(int(command[1]), int(command[3]), int(command[2]))
         elif command[0] == 'CANCEL':
-            answer = self.resources.unsubscribe(command[1], command[2])
+            answer = self.resources.unsubscribe(int(command[1]), int(command[2]))
         elif command[0] == 'STATUS':
-            answer = self.resources.status(command[1], command[2])
+            answer = self.resources.status(int(command[1]), int(command[2]))
         elif command[0] == 'INFOS':
-            answer = self.resources.infos(command[1], command[2])
+            answer = self.resources.infos(command[1], int(command[2]))
         elif command[0] == 'STATIS':
-            answer = self.resources.statis(command[1], command[2])
+            answer = self.resources.statis(command[1], int(command[2]))
 
         self.conn_sock.sendall(answer.encode())
 
