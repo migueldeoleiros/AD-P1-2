@@ -53,7 +53,10 @@ def validate_run(msg):
     # Verifica se o comando é composto (INFOS/STATIS)
     if isinstance(param_info[0], tuple):
         for option in param_info:
-            if parameters[0] in option:
+            if len(parameters) == 0:
+                print("MISSING-ARGUMENTS")
+                return True
+            elif parameters[0] in option:
                 num_params = option[1]
                 break
     else:  # Obtem o número de parâmetros se o comando for simples
