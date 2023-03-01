@@ -26,6 +26,7 @@ class server_connection:
         """Estabelece a ligação ao servidor especificado na inicialização."""
         self.sock = s.socket(s.AF_INET, s.SOCK_STREAM)
         self.sock.connect((self.address, self.port))
+        print('ligado a %s no porto %s' % (self.address, self.port))
 
     def send_receive(self, data):
         """
@@ -41,3 +42,4 @@ class server_connection:
     def close(self):
         """Termina a ligação ao servidor."""
         self.sock.close()
+        print('ligacao foi terminada')

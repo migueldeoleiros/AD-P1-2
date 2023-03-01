@@ -193,6 +193,7 @@ class ticker_server:
     def close(self):
         """Termina a ligação ao servidor."""
         self.conn_sock.close()
+        print('ligacao foi terminada')
 
 
 ###############################################################################
