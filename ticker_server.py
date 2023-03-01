@@ -27,6 +27,7 @@ class resource:
         self.Name = Name
         self.Symbol = Name[:3]
         self.Subscribers = []
+        self.Value = random.randint(100,200)
 
     def subscribe(self, client_id, time_limit):
         """Subcrebe cliente por um time_limit."""
@@ -69,10 +70,7 @@ class resource_pool:
         self.maxSubcriptions = K
         self.maxSubscribers = N
         self.Resources = {}
-        while len(self.Resources) < M:
-            id = random.randint(100, 200)
-            while id in self.Resources:
-                id = random.randint(100, 200)
+        for id in range(M):
             oneResource = resource(id)
             self.Resources[id] = oneResource
 
