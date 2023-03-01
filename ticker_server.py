@@ -78,8 +78,10 @@ class resource_pool:
 
     def clear_expired_subs(self):
         """Remove os subscritores que expiraram."""
-        # TODO
-        pass  # Remover esta linha e fazer implementação da função
+        for resource in self.Resources.values():
+            for (sub, time_limit) in resource.Subscribers:
+                if time_limit < time.time():
+                    resource.unsubscribe(sub)
 
     def subscribe(self, resource_id, client_id, time_limit):
         """Subscreve o cliente ao recurso com um limite de tempo para expiração."""
@@ -138,8 +140,8 @@ class resource_pool:
     def __repr__(self):
         """Retorna uma lista de subscritores dos recursos."""
         output = ""
-        for x in self.Resources:
-            output += self.Resources[x].__repr__() + "\n"
+        for resource in self.Resources.values():
+            output += resource.__repr__() + "\n"
         return output
 
 
@@ -162,9 +164,7 @@ class ticker_server:
         Returns:
             message (bytes): Mensagem recebida do cliente.
         """
-        message = self.conn_sock.recv(1024)
-        print(message.decode())
-        return message
+        return self.conn_sock.recv(1024)
 
     def process_command(self, msg):
         """Executa o comando apropriado para uma mensagem.
@@ -212,6 +212,7 @@ server = ticker_server(resources)
 
 while True:
     server.connect(sock)
+    resources.clear_expired_subs()
     message = server.receive()
     server.process_command(message.decode())
     server.close()
