@@ -206,14 +206,16 @@ N = int(sys.argv[5])
 sock = s.socket(s.AF_INET, s.SOCK_STREAM)
 sock.bind((host, port))
 
-resources = resource_pool(N, K, M)
-server = ticker_server(resources)
+try:
+    resources = resource_pool(N, K, M)
+    server = ticker_server(resources)
 
-while True:
-    server.connect(sock)
-    resources.clear_expired_subs()
-    message = server.receive()
-    server.process_command(message.decode())
-    server.close()
-
-sock.close()
+    while True:
+        server.connect(sock)
+        resources.clear_expired_subs()
+        message = server.receive()
+        server.process_command(message.decode())
+        server.close()
+finally:
+    sock.close()
+    print("Socket closed")

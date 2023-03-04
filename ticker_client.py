@@ -99,5 +99,5 @@ def run_local_command(msg):
 # Loop para o cliente (Sempre True, até recibir a message de EXIT)
 run = True
 while run:
-    message = input('comando -> ')
+    message = input('comando>')
     run = validate_run(message)
