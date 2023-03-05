@@ -186,6 +186,7 @@ class ticker_server:
         elif command[0] == 'STATIS':
             answer = self.resources.statis(command[1], int(command[2]))
 
+        print(answer)
         self.conn_sock.sendall(answer.encode())
 
     def close(self):
@@ -213,8 +214,9 @@ try:
     while True:
         server.connect(sock)
         resources.clear_expired_subs()
-        message = server.receive()
-        server.process_command(message.decode())
+        message = server.receive().decode()
+        print(message)
+        server.process_command(message)
         server.close()
 finally:
     sock.close()

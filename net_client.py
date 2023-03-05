@@ -34,6 +34,7 @@ class server_connection:
         e retorna a resposta recebida pela mesma socket.
         """
         # send
+        print(data.decode())
         self.sock.sendall(data)
         # receive
         msg = self.sock.recv(1024)
