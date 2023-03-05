@@ -3,7 +3,8 @@
 """
 Aplicações Distribuídas - Projeto 1 - ticker_client.py
 Grupo: 37
-Números de aluno: 58645, 59436
+Tiago Ramalho 58645
+Miguel López 59436
 """
 # Imports necessários
 from net_client import server_connection
