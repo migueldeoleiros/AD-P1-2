@@ -70,7 +70,7 @@ class resource_pool:
         self.maxSubcriptions = K
         self.maxSubscribers = N
         self.Resources = {}
-        for id in range(M):
+        for id in range(1, M+1):
             oneResource = resource(id)
             self.Resources[id] = oneResource
 
