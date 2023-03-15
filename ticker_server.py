@@ -9,6 +9,7 @@ Miguel López 59436
 
 # Imports necessários
 import socket as s
+import select as sel
 import sys
 import random
 import time
@@ -144,56 +145,30 @@ class resource_pool:
         return output
 
 
-class ticker_server:
-    """Gera as ligações por sockets com o cliente."""
+def process_command(msg, resources, conn_sock):
+    """Executa o comando apropriado para uma mensagem.
 
-    def __init__(self, resource_pool):
-        """Inicializa a classe com parâmetros para funcionamento futuro."""
-        self.resources = resource_pool
+    Args:
+        msg (str): Mensagem recebida do cliente.
 
-    def connect(self, socket):
-        """Estabelece a ligação ao cliente."""
-        socket.listen(1)
-        (self.conn_sock, (addr, port)) = socket.accept()
-        print('ligado a %s no porto %s' % (addr, port))
+    Returns:
+        answer (str): Resposta ao comando executado.
+    """
+    command = msg.split()
 
-    def receive(self):
-        """Recebe a mensagem do cliente.
+    if command[0] == 'SUBSCR':
+        answer = resources.subscribe(int(command[1]), int(command[3]), int(command[2]))
+    elif command[0] == 'CANCEL':
+        answer = resources.unsubscribe(int(command[1]), int(command[2]))
+    elif command[0] == 'STATUS':
+        answer = resources.status(int(command[1]), int(command[2]))
+    elif command[0] == 'INFOS':
+        answer = resources.infos(command[1], int(command[2]))
+    elif command[0] == 'STATIS':
+        answer = resources.statis(command[1], int(command[2]))
 
-        Returns:
-            message (bytes): Mensagem recebida do cliente.
-        """
-        return self.conn_sock.recv(1024)
-
-    def process_command(self, msg):
-        """Executa o comando apropriado para uma mensagem.
-
-        Args:
-            msg (str): Mensagem recebida do cliente.
-
-        Returns:
-            answer (str): Resposta ao comando executado.
-        """
-        command = msg.split()
-
-        if command[0] == 'SUBSCR':
-            answer = self.resources.subscribe(int(command[1]), int(command[3]), int(command[2]))
-        elif command[0] == 'CANCEL':
-            answer = self.resources.unsubscribe(int(command[1]), int(command[2]))
-        elif command[0] == 'STATUS':
-            answer = self.resources.status(int(command[1]), int(command[2]))
-        elif command[0] == 'INFOS':
-            answer = self.resources.infos(command[1], int(command[2]))
-        elif command[0] == 'STATIS':
-            answer = self.resources.statis(command[1], int(command[2]))
-
-        print(answer)
-        self.conn_sock.sendall(answer.encode())
-
-    def close(self):
-        """Termina a ligação ao servidor."""
-        self.conn_sock.close()
-        print('ligacao foi terminada')
+    print(answer)
+    conn_sock.sendall(answer.encode())
 
 
 ###############################################################################
@@ -205,20 +180,30 @@ M = int(sys.argv[3])
 K = int(sys.argv[4])
 N = int(sys.argv[5])
 
-sock = s.socket(s.AF_INET, s.SOCK_STREAM)
-sock.bind((host, port))
+listen_socket = s.socket(s.AF_INET, s.SOCK_STREAM)
+listen_socket.bind((host, port))
+listen_socket.listen(1)
 
 try:
     resources = resource_pool(N, K, M)
-    server = ticker_server(resources)
 
+    socket_list = [listen_socket]
     while True:
-        server.connect(sock)
-        resources.clear_expired_subs()
-        message = server.receive().decode()
-        print(message)
-        server.process_command(message)
-        server.close()
+        R, W, X = sel.select(socket_list, [], [])  # Espera sockets com
+        for sckt in R:
+            if sckt is listen_socket:  # Se for a socket de escuta...
+                conn_sock, addr = listen_socket.accept()
+                addr, port = conn_sock.getpeername()
+                print('Novo cliente ligado desde %s:%d' % (addr, port))
+                socket_list.append(conn_sock)  # Adiciona ligação à lista
+            else:  # Se for a socket de um cliente...
+                msg = sckt.recv(1024).decode()
+                if msg:  # Se recebeu dados
+                    process_command(msg, resources, sckt)
+                else:  # Se não recebeu dados
+                    sckt.close()  # cliente fechou ligação
+                    socket_list.remove(sckt)
+                    print('Cliente fechou ligação')
 finally:
-    sock.close()
+    listen_socket.close()
     print("Socket closed")

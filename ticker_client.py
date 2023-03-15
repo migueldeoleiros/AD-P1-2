@@ -17,7 +17,7 @@ host = sys.argv[2]
 port = int(sys.argv[3])
 
 
-def validate_run(msg):
+def validate_run(msg, conn):
     """
     Validate the command and run the apropiate function.
 
@@ -73,18 +73,8 @@ def validate_run(msg):
     if command in local_commands:
         return run_local_command(msg)
     else:
-        server_request(msg+" "+user)
+        conn.send_receive((msg+" "+user).encode())
         return True
-
-
-def server_request(msg):
-    """Função encarregada de fazer a Conexão com o server."""
-    conn = server_connection(host, port)
-    conn.connect()
-
-    conn.send_receive(msg.encode())
-
-    conn.close()
 
 
 def run_local_command(msg):
@@ -99,6 +89,11 @@ def run_local_command(msg):
 
 # Loop para o cliente (Sempre True, até recibir a message de EXIT)
 run = True
-while run:
-    message = input('comando>')
-    run = validate_run(message)
+conn = server_connection(host, port)
+conn.connect()
+try:
+    while run:
+        message = input('comando>')
+        run = validate_run(message, conn)
+except:
+    conn.close()
