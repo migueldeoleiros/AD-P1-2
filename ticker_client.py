@@ -17,7 +17,7 @@ host = sys.argv[2]
 port = int(sys.argv[3])
 
 
-def validate_run(msg, conn):
+def validate_run(msg, con):
     """
     Validate the command and run the apropiate function.
 
@@ -25,66 +25,82 @@ def validate_run(msg, conn):
         True if the command needs to continue
         False if the command needs to exit
     """
-    # Define o dicionario de comandos validos, assim como o seu número de parâmetros
-    valid_commands = {
-        'SUBSCR': (2, None),
-        'CANCEL': (1, None),
-        'STATUS': (1, None),
-        'INFOS':  (('M', 1), ('K', 1)),
-        'STATIS': (('L', 2), ('ALL', 1)),
-        'SLEEP':  (1, None),
-        'EXIT':   (0, None)
-    }
-    local_commands = ['SLEEP', 'EXIT']
 
     # Divide a string entre o comando, e os seus parâmetros
     parts = msg.split()
     command = parts[0]
     parameters = parts[1:]
 
-    # Verifica se o comando é válido
-    if command not in valid_commands:
-        print("UNKNOWN-COMMAND")
+
+    if command == "SUBSCR":
+        if len(parameters != 2):
+            print("MISSING-ARGUMENTS")
+            return True
+        #put here whatever the stub will do (MARK)
         return True
 
-    param_info = valid_commands[command]  # Recebe a informação do comando
+    elif command == "CANCEL":
+        if len(parameters != 1):
+            print("MISSING-ARGUMENTS")
+            return True
+        #put here whatever the stub will do (MARK)
+        return True
 
-    num_params = None  # Resultado esperado caso os proximos checks falhem
-
-    # Verifica se o comando é composto (INFOS/STATIS)
-    if isinstance(param_info[0], tuple):
-        for option in param_info:
-            if len(parameters) == 0:
+    elif command == "STATUS":
+        if len(parameters != 1):
+            print("MISSING-ARGUMENTS")
+            return True
+        #put here whatever the stub will do (MARK)
+        return True
+    
+    elif command == "INFOS":
+        if len(parameters != 1):
+            print("MISSING-ARGUMENTS")
+            return True
+        elif parameters[0] == "M":
+            #put here whatever the stub will do (MARK)
+            return True
+        elif parameters[0] == "K":
+            #put here whatever the stub will do (MARK)
+            return True
+        else:
+            print("MISSING-ARGUMENTS")
+            return True
+    
+    elif command == "STATIS":
+        if len(parameters < 1):
+            print("MISSING-ARGUMENTS")
+            return True
+        elif parameters[0] == "L":
+            if len(parameters!=2):
                 print("MISSING-ARGUMENTS")
                 return True
-            elif parameters[0] in option:
-                num_params = option[1]
-                break
-    else:  # Obtem o número de parâmetros se o comando for simples
-        num_params = param_info[0]
-
-    # Verifica se o número de parâmetros recebido é igual ao
-    # número de parâmetros necessário para o comando
-    if len(parameters) != num_params:
-        print("MISSING-ARGUMENTS")
+            #put here whatever the stub will do (MARK)
+            return True
+        elif parameters[0] == "ALL":
+            if len(parameters != 1):
+                print("MISSING-ARGUMENTS")
+                return True
+            #put here whatever the stub will do (MARK)
+            return True
+        else:
+            print("MISSING-ARGUMENTS")
+            return True
+    
+    elif command == "SLEEP":
+        if len(parameters != 1):
+            print("MISSING-ARGUMENTS")
+            return True
+        time.sleep(int(parameters[0]))
         return True
-
-    # Verifica se o comando é local ou do servidor
-    if command in local_commands:
-        return run_local_command(msg)
-    else:
-        conn.send_receive((msg+" "+user).encode())
-        return True
-
-
-def run_local_command(msg):
-    """Funcão encarregada de correr comandos locais."""
-    parts = msg.split()
-    if parts[0] == 'SLEEP':
-        time.sleep(int(parts[1]))
-        return True
-    else:
+    
+    elif command == "EXIT":
         return False
+    
+    else:
+        print("UNKNOWN-COMMAND")
+    
+
 
 
 # Loop para o cliente (Sempre True, até recibir a message de EXIT)
