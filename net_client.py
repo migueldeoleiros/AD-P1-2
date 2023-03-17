@@ -9,6 +9,8 @@ Miguel López 59436
 # zona para fazer importação
 
 import socket as s
+import pickle as p
+import struct as st
 
 # definição da classe server_connection
 
@@ -29,16 +31,24 @@ class server_connection:
         self.sock.connect((self.address, self.port))
         print('ligado a %s no porto %s' % (self.address, self.port))
 
-    def send_receive(self, data):
+    def send(self, data):
         """
         Envia os dados contidos em data para a socket da ligação,
         e retorna a resposta recebida pela mesma socket.
         """
-        # send
         print(data.decode())
-        self.sock.sendall(data)
-        # receive
-        msg = self.sock.recv(1024)
+        data_bytes = p.dumps(data,-1)
+        size_bytes = st.pack("i",len(data_bytes))
+        self.sock.sendall(size_bytes)
+        self.sock.sendall(data_bytes)
+    
+    def receive(self):
+        """Recebe os dados do servidor"""
+       
+        size_bytes = self.sock.recv(4)
+        size = st.unpack("i",size_bytes)[0]
+        msg_bytes = self.sock.recv(size)
+        msg = p.loads(msg_bytes)
         print(msg.decode())
 
     def close(self):

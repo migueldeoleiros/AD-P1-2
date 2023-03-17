@@ -7,7 +7,7 @@ Tiago Ramalho 58645
 Miguel López 59436
 """
 # Imports necessários
-from net_client import server_connection
+from ticker_stub import ticker_stub
 import sys
 import time
 
@@ -36,21 +36,21 @@ def validate_run(msg, con):
         if len(parameters != 2):
             print("MISSING-ARGUMENTS")
             return True
-        #put here whatever the stub will do (MARK)
+        con.subscribe(parameters[0],parameters[1],user)
         return True
 
     elif command == "CANCEL":
         if len(parameters != 1):
             print("MISSING-ARGUMENTS")
             return True
-        #put here whatever the stub will do (MARK)
+        con.unsubscribe(parameters[0],user)
         return True
 
     elif command == "STATUS":
         if len(parameters != 1):
             print("MISSING-ARGUMENTS")
             return True
-        #put here whatever the stub will do (MARK)
+        con.status(parameters[0],user)
         return True
     
     elif command == "INFOS":
@@ -58,10 +58,10 @@ def validate_run(msg, con):
             print("MISSING-ARGUMENTS")
             return True
         elif parameters[0] == "M":
-            #put here whatever the stub will do (MARK)
+            con.infos(40,user)
             return True
         elif parameters[0] == "K":
-            #put here whatever the stub will do (MARK)
+            con.infos(50,user)
             return True
         else:
             print("MISSING-ARGUMENTS")
@@ -75,13 +75,13 @@ def validate_run(msg, con):
             if len(parameters!=2):
                 print("MISSING-ARGUMENTS")
                 return True
-            #put here whatever the stub will do (MARK)
+            con.statis(60,parameters[1])
             return True
         elif parameters[0] == "ALL":
             if len(parameters != 1):
                 print("MISSING-ARGUMENTS")
                 return True
-            #put here whatever the stub will do (MARK)
+            con.statis(70)
             return True
         else:
             print("MISSING-ARGUMENTS")
@@ -105,11 +105,11 @@ def validate_run(msg, con):
 
 # Loop para o cliente (Sempre True, até recibir a message de EXIT)
 run = True
-conn = server_connection(host, port)
+conn = ticker_stub(host, port)
 conn.connect()
 try:
     while run:
         message = input('comando>')
         run = validate_run(message, conn)
 except:
-    conn.close()
+    conn.disconnect()
