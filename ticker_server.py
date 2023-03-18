@@ -11,63 +11,8 @@ Miguel López 59436
 import socket as s
 import select as sel
 import sys
-import pickle
-import struct
 from ticker_pool import resource_pool
-
-
-def process_command(command, resources, conn_sock):
-    """Executa o comando apropriado para uma mensagem.
-
-    Args:
-        command (list): Mensagem recebida do cliente.
-
-    Returns:
-        answer (str): Resposta ao comando executado.
-    """
-    if command[0] == 'SUBSCR':
-        answer = resources.subscribe(int(command[1]), int(command[3]), int(command[2]))
-    elif command[0] == 'CANCEL':
-        answer = resources.unsubscribe(int(command[1]), int(command[2]))
-    elif command[0] == 'STATUS':
-        answer = resources.status(int(command[1]), int(command[2]))
-    elif command[0] == 'INFOS':
-        answer = resources.infos(command[1], int(command[2]))
-    elif command[0] == 'STATIS':
-        answer = resources.statis(command[1], int(command[2]))
-
-    print(answer)
-    send_data(answer)
-
-
-def receive_data(sckt):
-    """Recebe dados através do socket especificado.
-
-    Args:
-        sckt: o socket para receber dados.
-    Returns:
-        os dados recebidos.
-    """
-    size_bytes = sckt.recv(4)
-    size = struct.unpack('i', size_bytes)[0]
-
-    msg_bytes = sckt.recv(size)
-    msg = pickle.loads(msg_bytes)
-    return msg
-
-
-def send_data(sckt, data):
-    """Envia dados através do socket especificado.
-
-    Args:
-        sckt: o socket para enviar dados.
-        data: os dados a serem enviados.
-    """
-    data_bytes = pickle.dumps(data, -1)
-    size_bytes = struct.pack('i', len(data_bytes))
-
-    conn_sock.sendall(size_bytes)
-    conn_sock.sendall(data_bytes)
+import ticker_skel as skel
 
 
 # código do programa principal
@@ -95,8 +40,11 @@ try:
                 socket_list.append(conn_sock)  # Adiciona ligação à lista
             else:  # Se for a socket de um cliente...
                 try:
-                    msg = receive_data(sckt)
-                    process_command(msg, resources, sckt)
+                    msg = skel.receive_data(sckt)
+                    print(msg)
+                    answer = skel.process_command(msg, resources, sckt)
+                    print(answer)
+                    skel.send_data(answer)
                 except (EOFError, ConnectionResetError):
                     sckt.close()  # cliente fechou ligação
                     socket_list.remove(sckt)
