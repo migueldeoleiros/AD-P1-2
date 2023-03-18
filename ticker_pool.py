@@ -49,15 +49,22 @@ class resource:
                 return True
         return False
 
-    def __repr__(self):
+    def listSubscribers(self):
         """Retorna a lista de subscritores do recurso."""
+        output = []
+        for x in self.Subscribers:
+            output.append(x[0])
+        if output == []:
+            output = [None]
+        return output
+
+    def __repr__(self):
+        """Retorna a lista de subscritores do recurso em String."""
         output = "R {} {}".format(self.ID, len(self.Subscribers))
         for x in self.Subscribers:
             output += " {}".format(x[0])
         return output
 
-
-###############################################################################
 
 class resource_pool:
     """Classe que representa uma pool de recursos que podem ser subscritos por clientes."""
@@ -82,12 +89,12 @@ class resource_pool:
         """Subscreve o cliente ao recurso com um limite de tempo para expiração."""
         if resource_id not in self.Resources:
             return None
-        elif int(self.infos("K", client_id)) > 0:
-            if int(self.statis("L", resource_id)) < self.maxSubscribers:
+        elif int(self.infosK(client_id)) > 0:
+            if int(self.statisL(resource_id)) < self.maxSubscribers:
                 x = self.Resources[resource_id].subscribe(client_id, time_limit)
                 if x:
-                    return "OK"
-        return "NOK"
+                    return True
+        return False
 
     def unsubscribe(self, resource_id, client_id):
         """Cancela a subscrição do cliente ao recurso."""
@@ -96,9 +103,9 @@ class resource_pool:
         else:
             x = self.Resources[resource_id].unsubscribe(client_id)
             if x:
-                return "OK"
+                return True
             else:
-                return "NOK"
+                return False
 
     def status(self, resource_id, client_id):
         """Retorna se o cliente está subscrito ao recurso."""
@@ -130,13 +137,16 @@ class resource_pool:
     def statisL(self, resource_id):
         """Lista informações sobre os recursos e seus subscritores."""
         if resource_id not in self.Resources:
-            return "UNKNOWN RESOURCE"
+            return None
         else:
-            return str(len(self.Resources[resource_id].Subscribers))
+            return len(self.Resources[resource_id].Subscribers)
 
     def statisAll(self):
-        """Lista informações sobre os recursos e seus subscritores."""
-        return self.__repr__()
+        """Retorna uma dos recursos e seus subscritores."""
+        output = []
+        for resource in self.Resources.values():
+            output.append(resource.listSubscribers())
+        return output
 
     def __repr__(self):
         """Retorna uma lista de subscritores dos recursos."""

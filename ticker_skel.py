@@ -23,7 +23,7 @@ def process_command(command, resources, conn_sock):
         answer (str): Resposta ao comando executado.
     """
     if command[0] == 10:  # SUBSCR
-        data = resources.subscribe(command[0], command[3], command[2])
+        data = resources.subscribe(command[1], command[3], command[2])
         answer = [11, data]
     elif command[0] == 20:  # CANCEL
         data = resources.unsubscribe(command[1], command[2])
@@ -42,7 +42,7 @@ def process_command(command, resources, conn_sock):
         answer = [61, data]
     elif command[0] == 70:  # STATIS ALL
         data = resources.statisAll()
-        answer = [71, data]
+        answer = [71] + data
 
     return answer
 
