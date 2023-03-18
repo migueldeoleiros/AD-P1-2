@@ -23,22 +23,22 @@ def process_command(command, resources, conn_sock):
         answer (str): Resposta ao comando executado.
     """
     if command[0] == 10:  # SUBSCR
-        data = resources.subscribe(int(command[0]), int(command[3]), int(command[2]))
+        data = resources.subscribe(command[0], command[3], command[2])
         answer = [11, data]
     elif command[0] == 20:  # CANCEL
-        data = resources.unsubscribe(int(command[1]), int(command[2]))
+        data = resources.unsubscribe(command[1], command[2])
         answer = [21, data]
     elif command[0] == 30:  # STATUS
-        data = resources.status(int(command[1]), int(command[2]))
+        data = resources.status(command[1], command[2])
         answer = [31, data]
     elif command[0] == 40:  # INFOS M
-        data = resources.infosM(int(command[1]))
+        data = resources.infosM(command[1])
         answer = [41, data]
     elif command[0] == 50:  # INFOS K
-        data = resources.infosK(int(command[1]))
+        data = resources.infosK(command[1])
         answer = [51, data]
     elif command[0] == 60:  # STATIS L
-        data = resources.statisL(int(command[1]))
+        data = resources.statisL(command[1])
         answer = [61, data]
     elif command[0] == 70:  # STATIS ALL
         data = resources.statisAll()

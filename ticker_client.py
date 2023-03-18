@@ -12,7 +12,7 @@ import sys
 import time
 
 # parâmetros recebidos pelo terminal
-user = sys.argv[1]
+user = int(sys.argv[1])
 host = sys.argv[2]
 port = int(sys.argv[3])
 
@@ -35,21 +35,21 @@ def validate_run(msg, con):
         if len(parameters) != 2:
             print("MISSING-ARGUMENTS")
             return True
-        con.subscribe(parameters[0], parameters[1], user)
+        con.subscribe(int(parameters[0]), int(parameters[1]), user)
         return True
 
     elif command == "CANCEL":
         if len(parameters) != 1:
             print("MISSING-ARGUMENTS")
             return True
-        con.unsubscribe(parameters[0], user)
+        con.unsubscribe(int(parameters[0]), user)
         return True
 
     elif command == "STATUS":
         if len(parameters) != 1:
             print("MISSING-ARGUMENTS")
             return True
-        con.status(parameters[0], user)
+        con.status(int(parameters[0]), user)
         return True
 
     elif command == "INFOS":
@@ -74,7 +74,7 @@ def validate_run(msg, con):
             if len(parameters) != 2:
                 print("MISSING-ARGUMENTS")
                 return True
-            con.statis(60, parameters[1])
+            con.statis(60, int(parameters[1]))
             return True
         elif parameters[0] == "ALL":
             if len(parameters) != 1:
