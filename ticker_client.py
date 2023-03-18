@@ -60,7 +60,6 @@ def validate_run(msg, con):
             con.infos(40, user)
             return True
         elif parameters[0] == "K":
-            time.sleep(2)
             con.infos(50, user)
             return True
         else:

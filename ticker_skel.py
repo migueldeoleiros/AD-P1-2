@@ -23,9 +23,9 @@ def process_command(command, resources, conn_sock):
         answer (str): Resposta ao comando executado.
     """
     if command[0] == 10:  # SUBSCR
-        data = resources.subscribe(int(command[1]), int(command[3]), int(command[2]))
+        data = resources.subscribe(int(command[0]), int(command[3]), int(command[2]))
         answer = [11, data]
-    elif command[0] == 20:  # CALCEL
+    elif command[0] == 20:  # CANCEL
         data = resources.unsubscribe(int(command[1]), int(command[2]))
         answer = [21, data]
     elif command[0] == 30:  # STATUS
