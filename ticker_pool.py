@@ -81,7 +81,7 @@ class resource_pool:
     def subscribe(self, resource_id, client_id, time_limit):
         """Subscreve o cliente ao recurso com um limite de tempo para expiração."""
         if resource_id not in self.Resources:
-            return "UNKNOWN RESOURCE"
+            return None
         elif int(self.infos("K", client_id)) > 0:
             if int(self.statis("L", resource_id)) < self.maxSubscribers:
                 x = self.Resources[resource_id].subscribe(client_id, time_limit)
@@ -92,7 +92,7 @@ class resource_pool:
     def unsubscribe(self, resource_id, client_id):
         """Cancela a subscrição do cliente ao recurso."""
         if resource_id not in self.Resources:
-            return "UNKNOWN RESOURCE"
+            return None
         else:
             x = self.Resources[resource_id].unsubscribe(client_id)
             if x:
@@ -103,7 +103,7 @@ class resource_pool:
     def status(self, resource_id, client_id):
         """Retorna se o cliente está subscrito ao recurso."""
         if resource_id not in self.Resources:
-            return "UNKNOWN RESOURCE"
+            return None
         else:
             x = self.Resources[resource_id].status(client_id)
             if x:
@@ -111,26 +111,32 @@ class resource_pool:
             else:
                 return "UNSUBSCRIBED"
 
-    def infos(self, option, client_id):
+    def infosM(self, client_id):
         """Lista informações sobre os clientes e suas subscrições."""
         result = []
         for x in self.Resources:
             if "SUBSCRIBED" == self.status(x, client_id):
                 result += [x]
-        if option == "M":
-            return str(result)
-        else:
-            return str(self.maxSubcriptions - len(result))
+        return result
 
-    def statis(self, option, resource_id):
+    def infosK(self, client_id):
+        """Lista informações sobre os clientes e suas subscrições."""
+        result = []
+        for x in self.Resources:
+            if "SUBSCRIBED" == self.status(x, client_id):
+                result += [x]
+        return (self.maxSubcriptions - len(result))
+
+    def statisL(self, resource_id):
         """Lista informações sobre os recursos e seus subscritores."""
-        if option == "L":
-            if resource_id not in self.Resources:
-                return "UNKNOWN RESOURCE"
-            else:
-                return str(len(self.Resources[resource_id].Subscribers))
+        if resource_id not in self.Resources:
+            return "UNKNOWN RESOURCE"
         else:
-            return self.__repr__()
+            return str(len(self.Resources[resource_id].Subscribers))
+
+    def statisAll(self):
+        """Lista informações sobre os recursos e seus subscritores."""
+        return self.__repr__()
 
     def __repr__(self):
         """Retorna uma lista de subscritores dos recursos."""

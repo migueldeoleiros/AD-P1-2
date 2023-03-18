@@ -8,6 +8,7 @@ Miguel López 59436
 """
 
 # Imports necessários
+import socket as s
 import pickle
 import struct
 
@@ -21,16 +22,27 @@ def process_command(command, resources, conn_sock):
     Returns:
         answer (str): Resposta ao comando executado.
     """
-    if command[0] == 'SUBSCR':
-        answer = resources.subscribe(int(command[1]), int(command[3]), int(command[2]))
-    elif command[0] == 'CANCEL':
-        answer = resources.unsubscribe(int(command[1]), int(command[2]))
-    elif command[0] == 'STATUS':
-        answer = resources.status(int(command[1]), int(command[2]))
-    elif command[0] == 'INFOS':
-        answer = resources.infos(command[1], int(command[2]))
-    elif command[0] == 'STATIS':
-        answer = resources.statis(command[1], int(command[2]))
+    if command[0] == 10:  # SUBSCR
+        data = resources.subscribe(int(command[1]), int(command[3]), int(command[2]))
+        answer = [11, data]
+    elif command[0] == 20:  # CALCEL
+        data = resources.unsubscribe(int(command[1]), int(command[2]))
+        answer = [21, data]
+    elif command[0] == 30:  # STATUS
+        data = resources.status(int(command[1]), int(command[2]))
+        answer = [31, data]
+    elif command[0] == 40:  # INFOS M
+        data = resources.infosM(int(command[1]))
+        answer = [41, data]
+    elif command[0] == 50:  # INFOS K
+        data = resources.infosK(int(command[1]))
+        answer = [51, data]
+    elif command[0] == 60:  # STATIS L
+        data = resources.statisL(int(command[1]))
+        answer = [61, data]
+    elif command[0] == 70:  # STATIS ALL
+        data = resources.statisAll()
+        answer = [71, data]
 
     return answer
 

@@ -44,7 +44,7 @@ try:
                     print(msg)
                     answer = skel.process_command(msg, resources, sckt)
                     print(answer)
-                    skel.send_data(answer)
+                    skel.send_data(sckt, answer)
                 except (EOFError, ConnectionResetError):
                     sckt.close()  # cliente fechou ligação
                     socket_list.remove(sckt)
