@@ -26,10 +26,10 @@ listen_socket = s.socket(s.AF_INET, s.SOCK_STREAM)
 listen_socket.bind((host, port))
 listen_socket.listen(1)
 
-try:
-    resources = resource_pool(N, K, M)
+resources = resource_pool(N, K, M)
 
-    socket_list = [listen_socket]
+socket_list = [listen_socket]
+try:
     while True:
         R, W, X = sel.select(socket_list, [], [])  # Espera sockets com
         for sckt in R:
@@ -50,6 +50,8 @@ try:
                     socket_list.remove(sckt)
                     print('Cliente fechou ligação')
 
-finally:
+except KeyboardInterrupt:
+    for sckt in socket_list:
+        sckt.close()
     listen_socket.close()
-    print("Socket closed")
+    print("Servidor encerrando")
