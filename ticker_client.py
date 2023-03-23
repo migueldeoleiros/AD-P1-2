@@ -31,73 +31,77 @@ def validate_run(msg, con):
     command = parts[0]
     parameters = parts[1:]
 
-    if command == "SUBSCR":
-        if len(parameters) != 2:
-            print("MISSING-ARGUMENTS")
-            return True
-        con.subscribe(int(parameters[0]), int(parameters[1]), user)
-        return True
-
-    elif command == "CANCEL":
-        if len(parameters) != 1:
-            print("MISSING-ARGUMENTS")
-            return True
-        con.unsubscribe(int(parameters[0]), user)
-        return True
-
-    elif command == "STATUS":
-        if len(parameters) != 1:
-            print("MISSING-ARGUMENTS")
-            return True
-        con.status(int(parameters[0]), user)
-        return True
-
-    elif command == "INFOS":
-        if len(parameters) != 1:
-            print("MISSING-ARGUMENTS")
-            return True
-        elif parameters[0] == "M":
-            con.infos(40, user)
-            return True
-        elif parameters[0] == "K":
-            con.infos(50, user)
-            return True
-        else:
-            print("MISSING-ARGUMENTS")
-            return True
-
-    elif command == "STATIS":
-        if len(parameters) < 1:
-            print("MISSING-ARGUMENTS")
-            return True
-        elif parameters[0] == "L":
+    try:
+        if command == "SUBSCR":
             if len(parameters) != 2:
                 print("MISSING-ARGUMENTS")
                 return True
-            con.statis(60, int(parameters[1]))
+            con.subscribe(int(parameters[0]), int(parameters[1]), user)
             return True
-        elif parameters[0] == "ALL":
+
+        elif command == "CANCEL":
             if len(parameters) != 1:
                 print("MISSING-ARGUMENTS")
                 return True
-            con.statis(70)
+            con.unsubscribe(int(parameters[0]), user)
             return True
+
+        elif command == "STATUS":
+            if len(parameters) != 1:
+                print("MISSING-ARGUMENTS")
+                return True
+            con.status(int(parameters[0]), user)
+            return True
+
+        elif command == "INFOS":
+            if len(parameters) != 1:
+                print("MISSING-ARGUMENTS")
+                return True
+            elif parameters[0] == "M":
+                con.infos(40, user)
+                return True
+            elif parameters[0] == "K":
+                con.infos(50, user)
+                return True
+            else:
+                print("MISSING-ARGUMENTS")
+                return True
+            
+        elif command == "STATIS":
+            if len(parameters) < 1:
+                print("MISSING-ARGUMENTS")
+                return True
+            elif parameters[0] == "L":
+                if len(parameters) != 2:
+                    print("MISSING-ARGUMENTS")
+                    return True
+                con.statis(60, int(parameters[1]))
+                return True
+            elif parameters[0] == "ALL":
+                if len(parameters) != 1:
+                    print("MISSING-ARGUMENTS")
+                    return True
+                con.statis(70)
+                return True
+            else:
+                print("MISSING-ARGUMENTS")
+                return True
+
+        elif command == "SLEEP":
+            if len(parameters) != 1:
+                print("MISSING-ARGUMENTS")
+                return True
+            time.sleep(int(parameters[0]))
+            return True
+        elif command == "EXIT":
+            return False
+
         else:
-            print("MISSING-ARGUMENTS")
+            print("UNKNOWN-COMMAND")
             return True
 
-    elif command == "SLEEP":
-        if len(parameters) != 1:
-            print("MISSING-ARGUMENTS")
-            return True
-        time.sleep(int(parameters[0]))
-        return True
-
-    elif command == "EXIT":
-        return False
-
-    else:
-        print("UNKNOWN-COMMAND")
+    except ValueError:
+        print("WRONG-ARGUMENT-TYPE")
         return True
 
 
