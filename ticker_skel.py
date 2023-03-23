@@ -11,6 +11,7 @@ Miguel López 59436
 import socket as s
 import pickle
 import struct
+import time
 
 
 def process_command(command, resources, conn_sock):
@@ -58,9 +59,19 @@ def receive_data(sckt):
     size_bytes = sckt.recv(4)
     size = struct.unpack('i', size_bytes)[0]
 
-    msg_bytes = sckt.recv(size)
-    msg = pickle.loads(msg_bytes)
-    return msg
+    msg = b''
+    start_time = time.monotonic()
+    while len(msg) < size:
+        remaining_time = 5 - (time.monotonic() - start_time)
+        if remaining_time < 0:
+            raise TimeoutError('Timeout while receiving data')
+        sckt.settimeout(remaining_time)
+        buf = sckt.recv(size - len(msg))
+        if not buf:
+            raise ConnectionError('Socket connection closed unexpectedly')
+        msg += buf
+
+    return pickle.loads(msg)
 
 
 def send_data(sckt, data):

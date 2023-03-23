@@ -40,11 +40,15 @@ try:
                 socket_list.append(conn_sock)  # Adiciona ligação à lista
             else:  # Se for a socket de um cliente...
                 try:
-                    msg = skel.receive_data(sckt)
-                    print('Cliente %s:%d: recebido: %s' % (addr, port, str(msg)))
-                    answer = skel.process_command(msg, resources, sckt)
-                    print('enviado:', answer)
-                    skel.send_data(sckt, answer)
+                    try:
+                        msg = skel.receive_data(sckt)
+                    except (TimeoutError, ConnectionError) as e:
+                        print(e)
+                    else:
+                        print('Cliente %s:%d: recebido: %s' % (addr, port, str(msg)))
+                        answer = skel.process_command(msg, resources, sckt)
+                        print('enviado:', answer)
+                        skel.send_data(sckt, answer)
                 except:
                     sckt.close()  # cliente fechou ligação
                     socket_list.remove(sckt)
