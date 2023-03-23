@@ -98,6 +98,7 @@ def validate_run(msg, con):
 
     else:
         print("UNKNOWN-COMMAND")
+        return True
 
 
 # Loop para o cliente (Sempre True, até recibir a message de EXIT)

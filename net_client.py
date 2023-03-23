@@ -36,20 +36,21 @@ class server_connection:
         Envia os dados contidos em data para a socket da ligação,
         e retorna a resposta recebida pela mesma socket.
         """
-        print(data)
         data_bytes = p.dumps(data, -1)
         size_bytes = st.pack("i", len(data_bytes))
         self.sock.sendall(size_bytes)
         self.sock.sendall(data_bytes)
-    
+        print("enviado 4 Bytes +", len(data_bytes), "Bytes")
+        print("enviado:", data)
+
     def receive(self):
         """Recebe os dados do servidor"""
-       
+
         size_bytes = self.sock.recv(4)
-        size = st.unpack("i",size_bytes)[0]
+        size = st.unpack("i", size_bytes)[0]
         msg_bytes = self.sock.recv(size)
         msg = p.loads(msg_bytes)
-        print(msg)
+        print("recebido:", msg)
 
     def close(self):
         """Termina a ligação ao servidor."""
