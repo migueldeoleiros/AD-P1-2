@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Aplicações Distribuídas - Projeto 1 - ticker_client.py
+Aplicações Distribuídas - Projeto 2 - ticker_client.py
 Grupo: 37
 Tiago Ramalho 58645
 Miguel López 59436

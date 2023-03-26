@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Aplicações Distribuídas - Projeto 1 - net_client.py
+Aplicações Distribuídas - Projeto 2 - net_client.py
 Grupo: 37
 Tiago Ramalho 58645
 Miguel López 59436

@@ -1,3 +1,12 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+Aplicações Distribuídas - Projeto 2 - ticker_stub.py
+Grupo: 37
+Tiago Ramalho 58645
+Miguel López 59436
+"""
+
 import socket as s
 from net_client import server_connection
 
